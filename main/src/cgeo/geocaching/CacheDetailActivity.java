@@ -138,6 +138,7 @@ public class CacheDetailActivity extends AbstractViewPagerActivity<CacheDetailAc
     private Geocache cache;
     private final Progress progress = new Progress();
     private SearchResult search;
+    private boolean sortWaypoints = false;
 
     private final GeoDirHandler locationUpdater = new GeoDirHandler() {
         @Override
@@ -2198,8 +2199,16 @@ public class CacheDetailActivity extends AbstractViewPagerActivity<CacheDetailAc
 
             // sort waypoints: PP, Sx, FI, OWN
             final List<Waypoint> sortedWaypoints = new ArrayList<Waypoint>(cache.getWaypoints());
-            Collections.sort(sortedWaypoints);
 
+            if (sortWaypoints) {
+                WaypointCaseComparator icc = new WaypointCaseComparator();
+                Collections.sort(sortedWaypoints, icc);
+                android.util.Log.d("cgeo", "load waypoints start with sort");
+            } else {
+                Collections.sort(sortedWaypoints);
+                android.util.Log.d("cgeo", "load waypoints start");
+            }
+            
             for (final Waypoint wpt : sortedWaypoints) {
                 final LinearLayout waypointView = (LinearLayout) getLayoutInflater().inflate(R.layout.waypoint_item, null);
 
@@ -2285,6 +2294,23 @@ public class CacheDetailActivity extends AbstractViewPagerActivity<CacheDetailAc
                 public void onClick(View v) {
                     EditWaypointActivity.startActivityAddWaypoint(CacheDetailActivity.this, cache);
                     refreshOnResume = true;
+                }
+            });
+            
+            final Button sortWaypoint = (Button) view.findViewById(R.id.sort_waypoint);
+            sortWaypoint.setClickable(true);
+            sortWaypoint.setOnClickListener(new View.OnClickListener() {
+                
+                @Override
+                public void onClick(View v) {
+                    
+                    if (sortWaypoints) {
+                        sortWaypoints = false;  // deactivate way point sorting
+                    } else {
+                        sortWaypoints = true;   // activate way point sorting
+                    }
+                    
+                    CacheDetailActivity.this.notifyDataSetChanged(); // reload cache details
                 }
             });
 
@@ -2471,6 +2497,16 @@ public class CacheDetailActivity extends AbstractViewPagerActivity<CacheDetailAc
         }
     }
 
+    /**
+     * for sorting way points by name
+     */
+    private class WaypointCaseComparator implements Comparator<Waypoint> {
+        @Override
+        public int compare(Waypoint waypoint, Waypoint waypoint2) {
+            return waypoint.getName().compareToIgnoreCase(waypoint2.getName());
+        }
+    }
+    
     @Override
     protected String getTitle(Page page) {
         // show number of waypoints directly in waypoint title

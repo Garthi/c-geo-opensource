@@ -528,6 +528,7 @@
       <item quantity="other">%d Wegpunkte</item>
   </plurals>
   <string name="cache_waypoints_add">Wegpunkt hinzufügen</string>
+  <string name="cache_waypoints_sort">Wegpunkte sortieren</string>
   <string name="cache_hint">Hinweis</string>
   <string name="cache_logs">Logbuch</string>
   <string name="cache_logsfriends">Logbuch (Freunde)</string>
